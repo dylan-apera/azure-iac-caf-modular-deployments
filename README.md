@@ -35,12 +35,19 @@ The enterprise-scale architecture approach advocates using Azure-native platform
 ---------------------
 
 Enterprise Agreement (EA) enrollment and Azure Active Directory tenants
+
 Identity and access management
+
 Management group and subscription organization
+
 Network topology and connectivity
+
 Management and monitoring
+
 Business continuity and disaster recovery
+
 Security governance and compliance
+
 Platform automation and DevOps
 
 

@@ -1,0 +1,98 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+
+    "parameters": {
+        "virtualMachines_digitane_dc_name": {
+            "defaultValue": "digitane-dc",
+            "type": "String"
+        },
+        "disks_digitane_dc_disk1_c2527b5308dc4272a432e4a12db2062e_externalid": {
+            "defaultValue": "/subscriptions/35bdd8ab-9f7c-4480-b9b3-ce99895fa80d/resourceGroups/onprem-dc-rg/providers/Microsoft.Compute/disks/digitane-dc_disk1_c2527b5308dc4272a432e4a12db2062e",
+            "type": "String"
+        },
+        "networkInterfaces_digitane_dc49_externalid": {
+            "defaultValue": "/subscriptions/35bdd8ab-9f7c-4480-b9b3-ce99895fa80d/resourceGroups/onprem-dc-rg/providers/Microsoft.Network/networkInterfaces/digitane-dc49",
+            "type": "String"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-07-01",
+            "name": "[parameters('virtualMachines_digitane_dc_name')]",
+            "location": "australiaeast",
+            "identity": {
+                "principalId": "b30ebaf4-e9df-4b9f-a041-0ad4c2fffb64",
+                "tenantId": "f8e99b78-09ce-4400-bf37-bb0d788d17a6",
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS1_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachines_digitane_dc_name'), '_disk1_c2527b5308dc4272a432e4a12db2062e')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "id": "[parameters('disks_digitane_dc_disk1_c2527b5308dc4272a432e4a12db2062e_externalid')]"
+                        },
+                        "deleteOption": "Detach"
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_digitane_dc_name')]",
+                    "adminUsername": "adm_dylanapera",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true,
+                        "patchSettings": {
+                            "patchMode": "AutomaticByOS",
+                            "assessmentMode": "ImageDefault",
+                            "enableHotpatching": false
+                        }
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_digitane_dc49_externalid')]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2021-07-01",
+            "name": "[concat(parameters('virtualMachines_digitane_dc_name'), '/enablevmaccess')]",
+            "location": "australiaeast",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_digitane_dc_name'))]"
+            ],
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.Compute",
+                "type": "VMAccessAgent",
+                "typeHandlerVersion": "2.0",
+                "settings": {},
+                "protectedSettings": {}
+            }
+        }
+    ]
+}
